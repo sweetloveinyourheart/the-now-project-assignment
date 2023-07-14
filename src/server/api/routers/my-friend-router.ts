@@ -24,6 +24,8 @@ export const myFriendRouter = router({
         /**
          * Question 4: Implement mutual friend count
          */
+
+        // Subquery to calculate the mutual friend count
         const mutualFriendCountSubquery = userMutualFriendCount(conn, ctx.session.userId, input.friendUserId);
 
         return conn
@@ -78,6 +80,7 @@ const userTotalFriendCount = (db: Database) => {
     .groupBy('friendships.userId')
 }
 
+// Retrieves the mutual friend count between two users
 const userMutualFriendCount = (db: Database, userId: number, friendUserId: number) => {
   return db
     .selectFrom('friendships')

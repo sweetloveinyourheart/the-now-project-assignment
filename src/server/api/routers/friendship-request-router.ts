@@ -69,6 +69,7 @@ export const friendshipRequestRouter = router({
        * Question 3: Fix bug
        */
 
+      // Deletes any existing friendship between the users and inserts a new friendship request.
       await ctx.db
         .deleteFrom('friendships')
         .where('userId', '=', ctx.session.userId)
@@ -94,20 +95,20 @@ export const friendshipRequestRouter = router({
          * Question 1: Implement api to accept a friendship request
          */
 
-        // add a record to the database when user accept friend request
+        // Updates the status of the friendship between the users to 'accepted'.
         await t.updateTable('friendships')
         .set({ status: 'accepted' })
         .where('userId', '=', input.friendUserId)
         .where('friendUserId', '=', ctx.session.userId)
         .execute();
         
-        // find existing friend request by friend
         const existingFriendship = await t.selectFrom('friendships')
           .select(['userId', 'friendUserId', 'status'])
           .where('userId', '=', ctx.session.userId)
           .where('friendUserId', '=', input.friendUserId)
           .executeTakeFirst();
 
+        // If the friendship already exists, updates the status.
         if (existingFriendship) {
           await t.updateTable('friendships')
             .set({ status: 'accepted' })
@@ -115,6 +116,7 @@ export const friendshipRequestRouter = router({
             .where('friendUserId', '=', input.friendUserId)
             .execute();
         } else {
+          // Otherwise, inserts a new friendship with 'accepted' status.
           await t.insertInto('friendships')
             .values({
               friendUserId: input.friendUserId,
@@ -134,6 +136,7 @@ export const friendshipRequestRouter = router({
        * Question 2: Implement api to decline a friendship request
        */
 
+      // Updates the status of the friendship between the users to 'declined'
       await ctx.db.updateTable('friendships')
         .set({ status: 'declined' })
         .where('userId', '=', input.friendUserId)
